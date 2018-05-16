@@ -1,0 +1,23 @@
+#Add on cart-template.liquid
+
+{% if section.settings.other_product %}
+	<div class="grid__item medium-up--one-half other_item">
+    <p>
+      <input type="hidden" name="attributes[extra-item]" value="" />
+      <input id="extra-item" type="checkbox" name="attributes[extra-item]" value="yes" {% if cart.attributes.extra-item %} checked="checked"{% endif %} style="float: none" />
+      <label for="extra-item" style="display:inline; padding-left: 5px; float: none;">Add Extra Items</label>
+    </p>
+  </div>
+{% endif %}
+
+#Add in json schema
+{
+  "type": "checkbox",
+  "id": "other_product",
+  "label": {
+    "en": "Show other adding product",
+    "de": "Warenkorb-Notifikationen erlauben",
+    "fr": "Activer les notes de panier"
+  },
+  "default": false
+}

@@ -1,0 +1,59 @@
+#replace product-handle here
+{% assign product = all_products['product-handle'] %}
+
+  {% assign id = 0 %}
+
+  {% for variant in product.variants  %}
+  #select variant index
+	{% if forloop.index == 2 %}
+      {% assign id = variant.id %}
+	{% endif %}
+  {% endfor %}
+
+{% assign extra_items_in_cart = 0 %}
+{% for item in cart.items %}
+  {% if item.id == id %}
+    {% assign extra_items_in_cart = item.quantity %}
+  {% endif %}
+{% endfor %}
+
+  <script>
+    Shopify.Cart = Shopify.Cart || {};
+    Shopify.Cart.ExtraItem = {};
+    Shopify.Cart.ExtraItem.set = function() {
+      jQuery.ajax({
+        type: 'POST',
+        url: '/cart/update.js',
+        data: { updates: { {{ id }}: 1 }, attributes: { 'extra-item': true } },
+        dataType: 'json',
+        success: function() { location.href = '/cart'; }
+      });
+    }
+    Shopify.Cart.ExtraItem.remove = function() {
+      jQuery.ajax({
+        type: 'POST',
+        url: '/cart/update.js',
+        data: { updates: { {{ id }}: 0 }, attributes: { 'extra-item': '' } },
+        dataType: 'json',
+        success: function() { location.href = '/cart'; }
+      });
+    }
+
+    {% if extra_items_in_cart == 0 and cart.attributes.extra-item != blank  %}
+      jQuery(function() {
+        Shopify.Cart.ExtraItem.set();
+      });
+    {% endif %}
+
+    // When the extra-item checkbox is checked or unchecked.
+    jQuery(function() {
+      jQuery('[name="attributes\[extra-item\]"]').change(function() {
+        if (jQuery(this).is(':checked')) {
+          Shopify.Cart.ExtraItem.set();
+        }
+        else {
+          Shopify.Cart.ExtraItem.remove();
+        }
+      });
+    });
+  </script>

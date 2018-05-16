@@ -1,0 +1,36 @@
+{% assign product = all_products['demo1'] %}
+
+{% unless product.variants.first.available == false %}
+
+  {% assign variant_id = product.variants.first.id %}
+
+  <script>
+    (function($) {
+      var cartItems = {{ cart.items | json }},
+          isAdded = 0,
+          qtyInTheCart = 0,
+          cartUpdates = {};
+      for (var i=0; i<cartItems.length; i++) {
+        if ( cartItems[i].id === {{ variant_id }} ) {
+          isAdded = 1;
+          qtyInTheCart = cartItems[i].quantity;
+          break;
+        }
+      }
+      cartUpdates = { {{ variant_id }}: 1 }
+      if(isAdded == 0){
+        var params = {
+          type: 'POST',
+          url: '/cart/update.js',
+          data: { updates: cartUpdates },
+          dataType: 'json',
+          success: function(stuff) {
+            // window.location.href = '/cart';
+            location.reload();
+          }
+        };
+        $.ajax(params);
+      }
+    })(jQuery);
+  </script>
+{% endunless %}
